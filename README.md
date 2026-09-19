@@ -1,6 +1,7 @@
 # ⚡ SenseLog — Autonomous Neural Logistics & Real-Time Supply Chain Intelligence Engine
 
-> **🏆 Hackathon Submission Project Showcase**  
+> **🏆 HackIndia TechSurge 2026 Submission — Team Byte zero**  
+> `[hackindia-team:techsurge-2k26:byte-zero]`  
 > *Transforming fragmented retail inventory into an autonomous, closed-loop neural logistics network powered by Deep Learning, Quantile Uncertainty Regression, Sentiment NLP, and 3D Geospatial Telemetry.*
 
 [![Devpost](https://img.shields.io/badge/Devpost-Project_Showcase-003E54?style=for-the-badge&logo=devpost&logoColor=white)](https://devpost.com)
