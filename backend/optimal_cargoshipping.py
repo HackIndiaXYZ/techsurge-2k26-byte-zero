@@ -168,48 +168,63 @@ def process_shipping():
     print("="*40)
 
 def generate_shipping_plan(product_name, shop_id, confirmed_qty=None, want_quick=None):
-    shop_map_rev = {'Shop_A': 'shop1', 'Shop_B': 'shop2', 'Shop_C': 'shop3'}
-    internal_shop_id = shop_map_rev.get(shop_id, shop_id)
+    shop_str = str(shop_id).strip().lower()
+    shop_map = {
+        'a': 'shop1', 'shop_a': 'shop1', 'shop1': 'shop1', '1': 'shop1',
+        'b': 'shop2', 'shop_b': 'shop2', 'shop2': 'shop2', '2': 'shop2',
+        'c': 'shop3', 'shop_c': 'shop3', 'shop3': 'shop3', '3': 'shop3'
+    }
+    internal_shop_id = shop_map.get(shop_str, shop_str)
+    
+    rank_key_map = {
+        'shop1': 'Shop_A', 'a': 'Shop_A', 'shop_a': 'Shop_A', '1': 'Shop_A',
+        'shop2': 'Shop_B', 'b': 'Shop_B', 'shop_b': 'Shop_B', '2': 'Shop_B',
+        'shop3': 'Shop_C', 'c': 'Shop_C', 'shop_c': 'Shop_C', '3': 'Shop_C'
+    }
+    rank_key = rank_key_map.get(shop_str, 'Shop_A')
 
     try:
         rankings = rankingmodel.get_shop_rankings()
-    except:
+    except Exception:
         rankings = {}
 
-    if confirmed_qty is None:
+    if confirmed_qty is None or float(confirmed_qty) <= 0:
         if os.path.exists('orders.csv'):
             orders = pd.read_csv('orders.csv')
-            match = orders[(orders['Product Name'].str.lower() == product_name.lower()) & (orders['Shop'] == internal_shop_id)]
-            confirmed_qty = match.iloc[0]['Order Quantity'] if not match.empty else 10
+            match = orders[(orders['Product Name'].str.lower() == str(product_name).lower()) & (orders['Shop'].str.lower() == internal_shop_id)]
+            confirmed_qty = float(match.iloc[0]['Order Quantity']) if not match.empty else 10.0
         else:
-            confirmed_qty = 10
+            confirmed_qty = 10.0
+    else:
+        confirmed_qty = float(confirmed_qty)
 
-    perf = rankings.get(shop_id, {'sentiment': 0.5})
-    quick_pct = calculate_quick_percentage(perf['sentiment'])
+    perf = rankings.get(rank_key, {'sentiment': 0.5})
+    sentiment = float(perf.get('sentiment', 0.5) if isinstance(perf, dict) else 0.5)
+    quick_pct = calculate_quick_percentage(sentiment)
     
     if want_quick is None:
-        quick_qty = int(confirmed_qty * quick_pct)
+        quick_qty = int(round(confirmed_qty * quick_pct))
     elif want_quick:
-        quick_qty = confirmed_qty
+        quick_qty = int(round(confirmed_qty))
     else:
         quick_qty = 0
 
-    normal_qty = confirmed_qty - quick_qty
+    normal_qty = int(round(confirmed_qty - quick_qty))
     vendor = get_vendor_for_product(product_name)
     
     plan = {
-        'product': product_name,
-        'shop': shop_id,
-        'total_qty': confirmed_qty,
+        'product': str(product_name),
+        'shop': str(shop_id),
+        'total_qty': int(confirmed_qty),
         'quick': {
-            'qty': quick_qty,
-            'vendor': vendor,
-            'eta_days': QUICK_DELIVERY_DAYS
+            'qty': int(quick_qty),
+            'vendor': str(vendor),
+            'eta_days': int(QUICK_DELIVERY_DAYS)
         },
         'normal': {
-            'qty': normal_qty,
+            'qty': int(normal_qty),
             'vendor': 'Standard Freight',
-            'eta_days': NORMAL_DELIVERY_DAYS
+            'eta_days': int(NORMAL_DELIVERY_DAYS)
         }
     }
     return plan

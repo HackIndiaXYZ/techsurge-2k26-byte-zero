@@ -7,12 +7,12 @@ export const storeRankings = [
 ];
 
 export const anomalies = [
-  { id: 1, store: 'B', item: 'Basmati Rice', spike: '+340%', time: '2h ago' },
-  { id: 2, store: 'A', item: 'Cooking Oil', spike: '+180%', time: '4h ago' },
-  { id: 3, store: 'C', item: 'Sugar 1kg', spike: '+220%', time: '6h ago' },
-  { id: 4, store: 'B', item: 'Wheat Flour', spike: '+150%', time: '8h ago' },
-  { id: 5, store: 'A', item: 'Milk Packets', spike: '+290%', time: '10h ago' },
-  { id: 6, store: 'C', item: 'Dal Toor', spike: '+170%', time: '12h ago' },
+  { id: 1, store: 'A', item: 'Jeans', spike: '+340%', time: '2h ago' },
+  { id: 2, store: 'B', item: 'Vacuum Cleaner', spike: '+180%', time: '4h ago' },
+  { id: 3, store: 'C', item: 'Television', spike: '+220%', time: '6h ago' },
+  { id: 4, store: 'B', item: 'Laptop', spike: '+150%', time: '8h ago' },
+  { id: 5, store: 'A', item: 'Shirt', spike: '+290%', time: '10h ago' },
+  { id: 6, store: 'C', item: 'Sofa', spike: '+170%', time: '12h ago' },
 ];
 
 const genDays = (base: number, variance: number) =>
@@ -41,22 +41,28 @@ export const genForecast = (storeId: string) =>
 
 export const inventoryData: Record<string, Array<{ product: string; shelf: number; backroom: number; maxCapacity: number }>> = {
   A: [
-    { product: 'Basmati Rice', shelf: 42, backroom: 118, maxCapacity: 200 },
-    { product: 'Cooking Oil', shelf: 15, backroom: 30, maxCapacity: 150 },
-    { product: 'Sugar 1kg', shelf: 67, backroom: 90, maxCapacity: 180 },
-    { product: 'Milk Packets', shelf: 8, backroom: 12, maxCapacity: 100 },
+    { product: 'Sofa', shelf: 10, backroom: 100, maxCapacity: 200 },
+    { product: 'Television', shelf: 3, backroom: 10, maxCapacity: 200 },
+    { product: 'Bed', shelf: 1, backroom: 40, maxCapacity: 200 },
+    { product: 'Toaster', shelf: 8, backroom: 20, maxCapacity: 200 },
+    { product: 'Laptop', shelf: 12, backroom: 50, maxCapacity: 200 },
+    { product: 'Smartphone', shelf: 15, backroom: 80, maxCapacity: 200 },
   ],
   B: [
-    { product: 'Basmati Rice', shelf: 22, backroom: 55, maxCapacity: 200 },
-    { product: 'Wheat Flour', shelf: 38, backroom: 80, maxCapacity: 150 },
-    { product: 'Dal Toor', shelf: 50, backroom: 100, maxCapacity: 180 },
-    { product: 'Cooking Oil', shelf: 5, backroom: 10, maxCapacity: 100 },
+    { product: 'Sofa', shelf: 5, backroom: 70, maxCapacity: 200 },
+    { product: 'Television', shelf: 4, backroom: 60, maxCapacity: 200 },
+    { product: 'Bed', shelf: 8, backroom: 100, maxCapacity: 200 },
+    { product: 'Coffee Maker', shelf: 6, backroom: 35, maxCapacity: 200 },
+    { product: 'Vacuum Cleaner', shelf: 7, backroom: 45, maxCapacity: 200 },
+    { product: 'Tablet', shelf: 11, backroom: 60, maxCapacity: 200 },
   ],
   C: [
-    { product: 'Sugar 1kg', shelf: 80, backroom: 140, maxCapacity: 250 },
-    { product: 'Milk Packets', shelf: 55, backroom: 70, maxCapacity: 150 },
-    { product: 'Dal Toor', shelf: 30, backroom: 65, maxCapacity: 180 },
-    { product: 'Basmati Rice', shelf: 60, backroom: 110, maxCapacity: 200 },
+    { product: 'Sofa', shelf: 6, backroom: 80, maxCapacity: 200 },
+    { product: 'Television', shelf: 5, backroom: 70, maxCapacity: 200 },
+    { product: 'Bed', shelf: 9, backroom: 110, maxCapacity: 200 },
+    { product: 'Microwave', shelf: 8, backroom: 40, maxCapacity: 200 },
+    { product: 'Couch', shelf: 4, backroom: 25, maxCapacity: 200 },
+    { product: 'Refrigerator', shelf: 3, backroom: 15, maxCapacity: 200 },
   ],
 };
 
@@ -69,32 +75,31 @@ export const sentimentAxes = [
 ];
 
 export const reviews = [
-  { name: 'Priya S.', stars: 5, text: 'Excellent quality and fresh products every time!', sentiment: 'POSITIVE' as const },
-  { name: 'Rahul M.', stars: 2, text: 'Stock is often out for basic items. Disappointing.', sentiment: 'NEGATIVE' as const },
-  { name: 'Anita K.', stars: 4, text: 'Good prices but delivery could be faster.', sentiment: 'POSITIVE' as const },
-  { name: 'Vikram J.', stars: 3, text: 'Average experience, nothing special.', sentiment: 'NEUTRAL' as const },
+  { name: 'Priya S.', stars: 5, text: 'Excellent build quality and durable furniture!', sentiment: 'POSITIVE' as const },
+  { name: 'Rahul M.', stars: 2, text: 'Stock is often low for popular electronics. Needs restocking.', sentiment: 'NEGATIVE' as const },
+  { name: 'Anita K.', stars: 4, text: 'Great prices on appliances but shipping took 4 days.', sentiment: 'POSITIVE' as const },
+  { name: 'Vikram J.', stars: 3, text: 'Average experience, packaging was slightly damaged.', sentiment: 'NEUTRAL' as const },
 ];
 
 export const recommendedOrders = [
-  { id: 1, product: 'Cooking Oil', store: 'A', currentStock: 45, predictedNeed: 120, recommendedQty: 85, orderByDate: '2026-03-28', vendor: 'OilCorp India', priority: 'URGENT' as const },
-  { id: 2, product: 'Milk Packets', store: 'A', currentStock: 20, predictedNeed: 90, recommendedQty: 80, orderByDate: '2026-03-27', vendor: 'DairyFresh Ltd', priority: 'URGENT' as const },
-  { id: 3, product: 'Wheat Flour', store: 'B', currentStock: 118, predictedNeed: 160, recommendedQty: 55, orderByDate: '2026-04-01', vendor: 'GrainMasters', priority: 'SOON' as const },
-  { id: 4, product: 'Basmati Rice', store: 'C', currentStock: 170, predictedNeed: 200, recommendedQty: 45, orderByDate: '2026-04-05', vendor: 'RiceKing Exports', priority: 'PLANNED' as const },
-  { id: 5, product: 'Dal Toor', store: 'B', currentStock: 60, predictedNeed: 130, recommendedQty: 80, orderByDate: '2026-03-30', vendor: 'PulseTraders', priority: 'SOON' as const },
-  { id: 6, product: 'Sugar 1kg', store: 'C', currentStock: 220, predictedNeed: 250, recommendedQty: 40, orderByDate: '2026-04-08', vendor: 'SweetHarvest Co', priority: 'PLANNED' as const },
+  { id: 1, product: 'Vacuum Cleaner', store: 'B', currentStock: 15, predictedNeed: 120, recommendedQty: 104, orderByDate: '2025-05-24', vendor: 'FastShip Inc', priority: 'URGENT' as const },
+  { id: 2, product: 'Couch', store: 'B', currentStock: 10, predictedNeed: 100, recommendedQty: 91, orderByDate: '2025-05-25', vendor: 'QuickDeliver', priority: 'URGENT' as const },
+  { id: 3, product: 'Bed', store: 'A', currentStock: 41, predictedNeed: 120, recommendedQty: 78, orderByDate: '2025-05-25', vendor: 'LuxuryGoods', priority: 'URGENT' as const },
+  { id: 4, product: 'Dining Table', store: 'B', currentStock: 25, predictedNeed: 80, recommendedQty: 55, orderByDate: '2025-05-28', vendor: 'BulkSupply Co', priority: 'SOON' as const },
+  { id: 5, product: 'Television', store: 'A', currentStock: 13, predictedNeed: 60, recommendedQty: 47, orderByDate: '2025-05-30', vendor: 'EcoFriendly Supplies', priority: 'SOON' as const },
+  { id: 6, product: 'Refrigerator', store: 'C', currentStock: 18, predictedNeed: 50, recommendedQty: 32, orderByDate: '2025-06-02', vendor: 'FastShip Inc', priority: 'PLANNED' as const },
 ];
 
 export const vendors = [
-  { id: 1, name: 'OilCorp India', reliability: 92, leadTime: '3 days', lastOrder: '2026-03-18', contact: 'vendor@oilcorp.in', priceHistory: [82, 84, 81, 85, 83] },
-  { id: 2, name: 'DairyFresh Ltd', reliability: 88, leadTime: '1 day', lastOrder: '2026-03-22', contact: 'orders@dairyfresh.in', priceHistory: [45, 46, 44, 47, 45] },
-  { id: 3, name: 'GrainMasters', reliability: 95, leadTime: '4 days', lastOrder: '2026-03-15', contact: 'supply@grainmasters.in', priceHistory: [32, 33, 31, 34, 32] },
-  { id: 4, name: 'RiceKing Exports', reliability: 85, leadTime: '5 days', lastOrder: '2026-03-10', contact: 'bulk@riceking.in', priceHistory: [58, 60, 57, 62, 59] },
-  { id: 5, name: 'PulseTraders', reliability: 90, leadTime: '3 days', lastOrder: '2026-03-20', contact: 'orders@pulsetraders.in', priceHistory: [72, 74, 70, 75, 73] },
-  { id: 6, name: 'SweetHarvest Co', reliability: 82, leadTime: '2 days', lastOrder: '2026-03-21', contact: 'sales@sweetharvest.in', priceHistory: [38, 40, 37, 41, 39] },
+  { id: 1, name: 'FastShip Inc', reliability: 95, leadTime: '3 days', lastOrder: '2025-05-20', contact: 'ops@fastship.com', priceHistory: [380, 390, 385, 399, 395] },
+  { id: 2, name: 'QuickDeliver', reliability: 92, leadTime: '2 days', lastOrder: '2025-05-22', contact: 'dispatch@quickdeliver.com', priceHistory: [340, 345, 342, 350, 348] },
+  { id: 3, name: 'BulkSupply Co', reliability: 88, leadTime: '5 days', lastOrder: '2025-05-18', contact: 'orders@bulksupply.com', priceHistory: [310, 315, 312, 320, 318] },
+  { id: 4, name: 'LuxuryGoods', reliability: 97, leadTime: '4 days', lastOrder: '2025-05-15', contact: 'concierge@luxurygoods.com', priceHistory: [440, 450, 445, 455, 450] },
+  { id: 5, name: 'EcoFriendly Supplies', reliability: 91, leadTime: '3 days', lastOrder: '2025-05-21', contact: 'green@ecosupplies.com', priceHistory: [360, 365, 362, 370, 368] },
 ];
 
 export const networkStatus = [
-  { store: 'A', name: 'Shop A — Mumbai', online: true, activeSKUs: 142, lastSync: '2 min ago' },
-  { store: 'B', name: 'Shop B — Delhi', online: true, activeSKUs: 128, lastSync: '5 min ago' },
-  { store: 'C', name: 'Shop C — Chennai', online: true, activeSKUs: 156, lastSync: '1 min ago' },
+  { store: 'A', name: 'Shop A — Mumbai', online: true, activeSKUs: 20, lastSync: '2 min ago' },
+  { store: 'B', name: 'Shop B — Delhi', online: true, activeSKUs: 20, lastSync: '5 min ago' },
+  { store: 'C', name: 'Shop C — Chennai', online: true, activeSKUs: 20, lastSync: '1 min ago' },
 ];

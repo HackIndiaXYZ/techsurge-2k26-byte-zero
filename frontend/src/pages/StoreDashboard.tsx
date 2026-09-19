@@ -1,44 +1,65 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMemo, useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Area, AreaChart, RadarChart, PolarGrid, PolarAngleAxis, Radar } from 'recharts';
-import { sentimentAxes, storeNames } from '@/data/mockData';
+import { sentimentAxes, storeNames, inventoryData, reviews as mockReviews, genForecast } from '@/data/mockData';
 import GlassTooltip from '@/components/GlassTooltip';
 import { Star, AlertCircle, ArrowUpRight, TrendingDown, TrendingUp, Package, ShieldAlert, Cpu } from 'lucide-react';
 import { api } from '@/lib/api';
+import { useAppStore, type StoreId } from '@/store/appStore';
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.1 } } };
 const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
 const StoreDashboard = () => {
+  const navigate = useNavigate();
+  const { setSelectedStore } = useAppStore();
   const { storeId: rawStoreId = 'A' } = useParams();
   const storeId = rawStoreId.toUpperCase();
-  const [forecast, setForecast] = useState<any[]>([]);
-  const [inventory, setInventory] = useState<any[]>([]);
-  const [storeReviews, setStoreReviews] = useState<any[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<string>('');
-  const [loading, setLoading] = useState(true);
+  
+  const initialInv = inventoryData[storeId] || inventoryData['A'] || [];
+  const [forecast, setForecast] = useState<any[]>(() => {
+    const raw = genForecast(storeId);
+    return raw.map(d => ({ day: `Day ${d.day}`, forecast: d.forecast, actual: d.actual }));
+  });
+  const [inventory, setInventory] = useState<any[]>(initialInv);
+  const [storeReviews, setStoreReviews] = useState<any[]>(mockReviews);
+  const [selectedProduct, setSelectedProduct] = useState<string>(initialInv[0]?.product || 'Sofa');
+  const [loading, setLoading] = useState(false);
 
-  const storeName = storeNames[storeId] || 'Unknown Store';
+  const storeName = storeNames[storeId] || `Shop ${storeId}`;
 
   useEffect(() => {
+    if (storeId === 'A' || storeId === 'B' || storeId === 'C') {
+      setSelectedStore(storeId as StoreId);
+    }
+  }, [storeId, setSelectedStore]);
+
+  useEffect(() => {
+    let isMounted = true;
     const loadStoreData = async () => {
       try {
-        const [inv, revs] = await Promise.all([
+        const [invRes, revsRes] = await Promise.allSettled([
           api.getInventory(storeId),
           api.getReviews(storeId)
         ]);
-        setInventory(inv);
-        setStoreReviews(revs);
-        
-        if (inv.length > 0 && !selectedProduct) {
-          setSelectedProduct(inv[0].product);
+        if (!isMounted) return;
+        if (invRes.status === 'fulfilled' && Array.isArray(invRes.value) && invRes.value.length > 0) {
+          setInventory(invRes.value);
+          setSelectedProduct(prev => {
+            const exists = invRes.value.some((x: any) => x.product === prev);
+            return exists ? prev : invRes.value[0].product;
+          });
+        }
+        if (revsRes.status === 'fulfilled' && Array.isArray(revsRes.value) && revsRes.value.length > 0) {
+          setStoreReviews(revsRes.value);
         }
       } catch (err) {
         console.error("Failed to load store data:", err);
       }
     };
     loadStoreData();
+    return () => { isMounted = false; };
   }, [storeId]);
 
   const [forecastMetadata, setForecastMetadata] = useState<any>(null);
@@ -47,6 +68,7 @@ const StoreDashboard = () => {
     const fetchForecast = async () => {
       if (!selectedProduct) return;
       try {
+        setLoading(true);
         const f = await api.getForecast(storeId, selectedProduct);
         setForecastMetadata({
            confidence: f.confidence_score,
@@ -56,14 +78,15 @@ const StoreDashboard = () => {
            total_demand: f.total_demand,
            visible_stock: f.predicted_visible_stock,
            inventory: f.predicted_inventory,
-           daily_array: f.daily_demand_array || [],
+           daily_array: f.daily_demand_array || f.predictions || [],
            demand_shift: f.demand_shift_pct,
            forecast_range: f.forecast_range
         });
 
-        // Use new weekly_forecasts if daily_demand is missing, else fallback to daily predictions
-        if (f.daily_demand_array && f.daily_demand_array.length > 0) {
-          const chartData = f.daily_demand_array.map((val: number, i: number) => ({
+        // Use daily demand array if available, else weekly
+        const dailyArr = f.daily_demand_array || f.predictions;
+        if (dailyArr && dailyArr.length > 0) {
+          const chartData = dailyArr.map((val: number, i: number) => ({
             day: `Day ${i + 1}`,
             forecast: val,
             actual: i < 5 ? Math.max(0, val - 1) : null
@@ -73,16 +96,9 @@ const StoreDashboard = () => {
           const weeklyChart = Object.entries(f.weekly_forecasts).map(([name, val]: [string, any], i: number) => ({
             day: name.replace('_', ' '),
             forecast: val,
-            actual: i === 0 ? val - 2 : null // Simulated partial historical
+            actual: i === 0 ? val - 2 : null
           }));
           setForecast(weeklyChart);
-        } else {
-          const chartData = (f.predictions || []).map((val: number, i: number) => ({
-            day: i + 1,
-            forecast: val,
-            actual: i < 5 ? Math.max(0, val - 1) : null
-          }));
-          setForecast(chartData);
         }
       } catch (err) {
         console.error("Forecast failed:", err);
@@ -93,13 +109,21 @@ const StoreDashboard = () => {
     fetchForecast();
   }, [storeId, selectedProduct]);
 
-  const radarData = sentimentAxes.map(a => ({ axis: a.axis, value: a[storeId as keyof typeof a] as number }));
+  const radarData = sentimentAxes.map(a => ({ axis: a.axis, value: (a as any)[storeId] || 75 }));
 
   const stockOutDayIndex = useMemo(() => {
     if (!forecast || forecast.length === 0) return -1;
-    // Flag risk if forecast is 40% higher than historical/avg
-    return forecast.findIndex(d => d.forecast > (d.actual ?? (d.forecast * 0.8)) * 1.4);
-  }, [forecast]);
+    const initialStock = (forecastMetadata?.visible_stock ?? 0) + (forecastMetadata?.inventory ?? 0);
+    if (initialStock > 0) {
+      let cum = 0;
+      for (let i = 0; i < forecast.length; i++) {
+        cum += (forecast[i].forecast || 0);
+        if (cum >= initialStock) return i;
+      }
+    }
+    const avg = forecast.reduce((acc, curr) => acc + (curr.forecast || 0), 0) / forecast.length;
+    return forecast.findIndex(d => (d.forecast || 0) > avg * 1.3);
+  }, [forecast, forecastMetadata]);
 
   const minDemand = forecast.length > 0 ? Math.min(...forecast.map(d => d.forecast || 0)) : 0;
   const maxDemand = forecast.length > 0 ? Math.max(...forecast.map(d => d.forecast || 0)) : 0;
@@ -118,18 +142,38 @@ const StoreDashboard = () => {
             <h1 className="font-display text-3xl text-white tracking-widest">{storeName}</h1>
           </motion.div>
           
-          <motion.div variants={item} className="flex items-center gap-3 bg-[#030712]/50 backdrop-blur-md border border-white/10 p-2 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-            <span className="text-xs font-display text-muted-foreground tracking-widest pl-2">SKU:</span>
-            <div className="relative">
-              <select 
-                value={selectedProduct}
-                onChange={(e) => setSelectedProduct(e.target.value)}
-                className="appearance-none bg-primary/10 border border-primary/20 hover:border-primary/40 rounded-lg pl-4 pr-10 py-2 text-sm font-display tracking-wider text-primary outline-none transition-all cursor-pointer min-w-[200px]"
-              >
-                {inventory.map(item => (
-                  <option key={item.product} value={item.product} className="bg-[#030712]">{item.product}</option>
-                ))}
-              </select>
+          <motion.div variants={item} className="flex flex-wrap items-center gap-3">
+            {/* Store switcher pills */}
+            <div className="flex items-center bg-[#030712]/50 backdrop-blur-md border border-white/10 p-1 rounded-xl">
+              {(['A', 'B', 'C'] as const).map(s => (
+                <button
+                  key={s}
+                  onClick={() => navigate(`/store/${s}`)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-display tracking-wider transition-all ${
+                    storeId === s
+                      ? 'bg-primary/20 text-primary border border-primary/30 shadow-[0_0_10px_rgba(34,211,238,0.2)]'
+                      : 'text-muted-foreground hover:text-white'
+                  }`}
+                >
+                  Shop {s}
+                </button>
+              ))}
+            </div>
+
+            {/* SKU dropdown */}
+            <div className="flex items-center gap-2 bg-[#030712]/50 backdrop-blur-md border border-white/10 p-2 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+              <span className="text-xs font-display text-muted-foreground tracking-widest pl-2">SKU:</span>
+              <div className="relative">
+                <select 
+                  value={selectedProduct}
+                  onChange={(e) => setSelectedProduct(e.target.value)}
+                  className="appearance-none bg-primary/10 border border-primary/20 hover:border-primary/40 rounded-lg pl-4 pr-10 py-2 text-sm font-display tracking-wider text-primary outline-none transition-all cursor-pointer min-w-[180px]"
+                >
+                  {inventory.map(item => (
+                    <option key={item.product} value={item.product} className="bg-[#030712]">{item.product}</option>
+                  ))}
+                </select>
+              </div>
             </div>
           </motion.div>
         </div>

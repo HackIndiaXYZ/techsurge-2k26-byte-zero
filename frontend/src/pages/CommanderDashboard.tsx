@@ -5,7 +5,7 @@ import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, R
 import GlassTooltip from '@/components/GlassTooltip';
 import { Wifi, WifiOff } from 'lucide-react';
 import { api } from '@/lib/api';
-import { networkSalesData as mockSalesData } from '@/data/mockData';
+import { networkSalesData as mockSalesData, storeRankings, anomalies, networkStatus } from '@/data/mockData';
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.08 } } };
 const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
@@ -13,29 +13,38 @@ const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 const CommanderDashboard = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('All');
-  const [rankings, setRankings] = useState<any[]>([]);
-  const [anomalyFeed, setAnomalyFeed] = useState<any[]>([]);
-  const [statusList, setStatusList] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [rankings, setRankings] = useState<any[]>(storeRankings);
+  const [anomalyFeed, setAnomalyFeed] = useState<any[]>(anomalies);
+  const [statusList, setStatusList] = useState<any[]>(networkStatus);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
     const loadData = async () => {
       try {
-        const [r, a, s] = await Promise.all([
+        const [r, a, s] = await Promise.allSettled([
           api.getRankings(),
           api.getAnomalies(),
           api.getStatus()
         ]);
-        setRankings(r);
-        setAnomalyFeed(a);
-        setStatusList(s);
+        if (!isMounted) return;
+        if (r.status === 'fulfilled' && Array.isArray(r.value) && r.value.length > 0) {
+          setRankings(r.value);
+        }
+        if (a.status === 'fulfilled' && Array.isArray(a.value) && a.value.length > 0) {
+          setAnomalyFeed(a.value);
+        }
+        if (s.status === 'fulfilled' && Array.isArray(s.value) && s.value.length > 0) {
+          setStatusList(s.value);
+        }
       } catch (err) {
         console.error("Failed to fetch dashboard data:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
     loadData();
+    return () => { isMounted = false; };
   }, []);
 
   const sorted = [...rankings].sort((a, b) => b.sentimentScore - a.sentimentScore);

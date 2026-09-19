@@ -143,7 +143,15 @@ def calculate_order_quantity(product_data, predictions, reorder_threshold):
         return total_predicted_demand - total_future_stock
     return 0
 
+_FORECAST_CACHE_3 = {}
+_CACHED_MODEL_3 = None
+
 def demand_forecasting_main(file_names, product_name_input):
+    global _CACHED_MODEL_3
+    cache_key = str(product_name_input).strip().lower()
+    if cache_key in _FORECAST_CACHE_3:
+        return _FORECAST_CACHE_3[cache_key]
+
     combine_df = load_and_preprocess_data(file_names)
     combine_df, scaler_demand, scaler_stock = preprocessing_data(combine_df)
 
@@ -155,17 +163,21 @@ def demand_forecasting_main(file_names, product_name_input):
     X, y = np.array(x), np.array(y)
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
     model_path = 'shop3_model.h5'
-    if os.path.exists(model_path):
+    if _CACHED_MODEL_3 is not None:
+        model = _CACHED_MODEL_3
+    elif os.path.exists(model_path):
         model = create_lstm_model(sequence_length)
         model.load_weights(model_path)
+        _CACHED_MODEL_3 = model
     else:
         print(f"[AI] Training new Shop 3 model...")
         model = create_lstm_model(sequence_length)
         train_model(model, X_train, y_train, X_val, y_val)
         model.save(model_path)
+        _CACHED_MODEL_3 = model
 
     for product_name in combine_df['Product Name'].unique():
-        if product_name == product_name_input:
+        if product_name.strip().lower() == product_name_input.strip().lower():
             product_data = combine_df[combine_df['Product Name'] == product_name].reset_index(drop=True)
             product_data = preprocessing_data(product_data)[0]
             
@@ -203,10 +215,11 @@ def demand_forecasting_main(file_names, product_name_input):
                 print(f"Aggregate Profit Margin: {profit_pct:.2f}%\n")
                 
                 reorder_needed, reorder_date = check_reorder_and_print(product_data, product_name, predictions)
-                if reorder_needed:
-                    order_quantity = calculate_order_quantity(product_data, predictions, ReorderThresholds[product_name])
-                    return reorder_date, order_quantity, predictions, round(profit_pct, 2), int(total_demand), int(final_vis), int(final_inv)
-            move_to_visible(product_data, product_name)
+                move_to_visible(product_data, product_name)
+                order_quantity = calculate_order_quantity(product_data, predictions, ReorderThresholds.get(product_name, 5)) if reorder_needed else 0
+                res = (reorder_date if reorder_needed else None, int(order_quantity), predictions, round(profit_pct, 2), int(total_demand), int(final_vis), int(final_inv))
+                _FORECAST_CACHE_3[cache_key] = res
+                return res
             break
     return None, 0, [], 0.0, 0, 0, 0
 

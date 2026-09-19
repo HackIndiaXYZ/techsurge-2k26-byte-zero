@@ -15,15 +15,19 @@ def get_weekly_forecasts(product_name, shop_filter='all'):
     }
     
     target_shops = {}
-    if shop_filter.lower() == 'all':
+    if str(shop_filter).strip().lower() == 'all':
         target_shops = shops
     else:
-        # Standardize input mapping (A -> Shop_A, etc)
-        key = f"Shop_{shop_filter.upper()}" if len(shop_filter) == 1 else shop_filter
+        filter_clean = str(shop_filter).strip().lower()
+        store_map = {
+            'a': 'Shop_A', '1': 'Shop_A', 'shop1': 'Shop_A', 'shop_a': 'Shop_A',
+            'b': 'Shop_B', '2': 'Shop_B', 'shop2': 'Shop_B', 'shop_b': 'Shop_B',
+            'c': 'Shop_C', '3': 'Shop_C', 'shop3': 'Shop_C', 'shop_c': 'Shop_C',
+        }
+        key = store_map.get(filter_clean, f"Shop_{filter_clean.upper()}")
         if key in shops:
             target_shops = {key: shops[key]}
         else:
-            print(f"Error: Shop '{shop_filter}' not recognized. Using all stores.")
             target_shops = shops
 
     weekly_data = []
@@ -46,9 +50,11 @@ def get_weekly_forecasts(product_name, shop_filter='all'):
                 weeks.append(week_sum)
             
             coef_var = np.std(predictions) / np.mean(predictions) if np.mean(predictions) > 0 else 0
-            anomaly_count = len(anomalies_df[(anomalies_df['Shop_ID'] == shop_name) & (anomalies_df['Product_Name'] == product_name)])
+            anomaly_count = 0
+            if not anomalies_df.empty and 'Shop_ID' in anomalies_df.columns and 'Product_Name' in anomalies_df.columns:
+                anomaly_count = len(anomalies_df[(anomalies_df['Shop_ID'] == shop_name) & (anomalies_df['Product_Name'] == product_name)])
             
-            confidence = max(10, min(98, 95 - (coef_var * 20) - (anomaly_count * 5)))
+            confidence = max(10.0, min(98.0, 95.0 - (coef_var * 20.0) - (anomaly_count * 5.0)))
             
             future_info = futuredemand.get_predictions_for_api(shop_name, product_name)
             reason = future_info[0]['Reason'] if future_info else "Market Trends"

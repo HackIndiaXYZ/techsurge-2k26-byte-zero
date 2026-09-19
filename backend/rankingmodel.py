@@ -44,7 +44,13 @@ def get_advanced_sentiment(reviews_df):
     reviews_df.to_csv(cache_path, index=False)
     return reviews_df
 
+_RANKINGS_CACHE = None
+
 def get_shop_rankings():
+    global _RANKINGS_CACHE
+    if _RANKINGS_CACHE is not None:
+        return _RANKINGS_CACHE
+
     # Model/Data Paths
     model_path = 'ranking_model.pth'
     sales_file = 'shop_sale.csv'
@@ -98,6 +104,7 @@ def get_shop_rankings():
                 'score': final_score,
                 'sentiment': sents[i]
             }
+        _RANKINGS_CACHE = results
     return results
 
 if __name__ == "__main__":

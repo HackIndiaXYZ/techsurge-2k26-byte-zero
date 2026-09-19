@@ -1,15 +1,16 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
-import { Check, Truck, Zap, RefreshCw, ChevronDown } from 'lucide-react';
+import { Check, Truck, Zap, RefreshCw, ChevronDown, RotateCcw } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useAppStore } from '@/store/appStore';
+
+import { recommendedOrders } from '@/data/mockData';
 
 const container = { hidden: {}, show: { transition: { staggerChildren: 0.06 } } };
 const item = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
 
 const QUICK_DELIVERY_DAYS = 5;
 const NORMAL_DELIVERY_DAYS = 10;
-const QUICK_PCT = 0.25;
 
 interface OrderRow {
   id: number;
@@ -26,6 +27,22 @@ interface OrderRow {
   vendorOptions: any[];
   vendorOpen: boolean;
 }
+
+const defaultOrderRows: OrderRow[] = recommendedOrders.map((o, i) => ({
+  id: i + 1,
+  product: o.product,
+  store: o.store === 'A' ? 'shop1' : o.store === 'B' ? 'shop2' : 'shop3',
+  recommendedQty: o.recommendedQty,
+  editedQty: o.recommendedQty,
+  quickQty: Math.round(o.recommendedQty * 0.2),
+  normalQty: o.recommendedQty - Math.round(o.recommendedQty * 0.2),
+  orderByDate: o.orderByDate,
+  vendor: o.vendor,
+  priority: o.priority,
+  checked: true,
+  vendorOptions: [],
+  vendorOpen: false,
+}));
 
 const priorityStyles = {
   URGENT: 'bg-destructive/20 text-destructive border-destructive/30',
@@ -77,12 +94,19 @@ const InlineEdit = ({ value, onChange }: { value: number; onChange: (v: number) 
 
 const OrderNexus = () => {
   const { selectedStore } = useAppStore();
-  const [orders, setOrders] = useState<OrderRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [storeFilter, setStoreFilter] = useState<'All' | 'A' | 'B' | 'C'>(selectedStore || 'All');
+  const [orders, setOrders] = useState<OrderRow[]>(defaultOrderRows);
+  const [loading, setLoading] = useState(false);
   const [confirming, setConfirming] = useState(false);
   const [processingCount, setProcessingCount] = useState(0);
   const [dispatchedIds, setDispatchedIds] = useState<number[]>([]);
   const [confirmed, setConfirmed] = useState(false);
+
+  useEffect(() => {
+    if (selectedStore) {
+      setStoreFilter(selectedStore);
+    }
+  }, [selectedStore]);
 
   const updateOrder = (id: number, updates: Partial<OrderRow>) =>
     setOrders(prev => prev.map(o => o.id === id ? { ...o, ...updates } : o));
@@ -102,15 +126,30 @@ const OrderNexus = () => {
   };
 
   const loadOrders = async () => {
-    setLoading(true);
     try {
-      const liveOrders = await api.getOrders();
+      const [liveOrders, shopRankings] = await Promise.all([
+        api.getOrders(),
+        api.getRankings().catch(() => [])
+      ]);
+
+      const sentimentByShop: Record<string, number> = {};
+      if (Array.isArray(shopRankings)) {
+        shopRankings.forEach((r: any) => {
+          if (r.store) {
+            const sKey = r.store === 'A' ? 'shop1' : r.store === 'B' ? 'shop2' : 'shop3';
+            sentimentByShop[sKey] = (Number(r.sentimentScore) || 50) / 100;
+          }
+        });
+      }
+
       // Keep track of existing vendors to avoid redundant API calls
       const existingVendors = new Map(orders.map(o => [o.product, { v: o.vendor, opts: o.vendorOptions }]));
       
       const rows: OrderRow[] = liveOrders.map((o: any, i: number) => {
         const qty = Number(o['Order Quantity']) || 0;
-        const quickQty = Math.round(qty * QUICK_PCT);
+        const storeSent = sentimentByShop[o['Shop']] ?? 0.5;
+        const dynamicQuickPct = 0.10 + (storeSent * 0.15);
+        const quickQty = Math.round(qty * dynamicQuickPct);
         const product = o['Product Name'];
         const existing = existingVendors.get(product);
         
@@ -187,7 +226,7 @@ const OrderNexus = () => {
       setTimeout(() => {
         setConfirmed(false);
         setDispatchedIds([]);
-      }, 4000);
+      }, 3000);
       
       await loadOrders();
     } catch (err) {
@@ -196,10 +235,22 @@ const OrderNexus = () => {
     }
   };
 
+  const onResetOrders = async () => {
+    setLoading(true);
+    try {
+      await api.resetOrders();
+      await loadOrders();
+    } catch (err) {
+      console.error('Failed to reset orders:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const storeMapRev: Record<string, string> = { 'A': 'shop1', 'B': 'shop2', 'C': 'shop3' };
-  const filteredOrders = !selectedStore 
+  const filteredOrders = storeFilter === 'All'
     ? orders 
-    : orders.filter(o => o.store === storeMapRev[selectedStore]);
+    : orders.filter(o => o.store === storeMapRev[storeFilter]);
 
   const checkedCount = filteredOrders.filter(o => o.checked).length;
   const totalUnits = filteredOrders.filter(o => o.checked).reduce((a, o) => a + o.editedQty, 0);
@@ -210,17 +261,46 @@ const OrderNexus = () => {
     <motion.div variants={container} initial="hidden" animate="show" className="min-h-screen pt-20 pb-8 px-4 md:px-6 bg-background">
       <div className="max-w-[1500px] mx-auto">
 
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <motion.h1 variants={item} className="font-display text-xl text-primary tracking-widest">ORDER NEXUS</motion.h1>
             <motion.p variants={item} className="text-xs text-muted-foreground font-body mt-1">
               {checkedCount} orders selected · {totalUnits} total units · <span className="text-warning">{totalQuick} quick</span> · {totalNormal} standard
             </motion.p>
           </div>
-          <div className="flex items-center gap-3">
+          
+          <div className="flex flex-wrap items-center gap-3">
+            {/* Store Filter Pills */}
+            <div className="flex items-center bg-[#030712]/50 backdrop-blur-md border border-white/10 p-1 rounded-xl">
+              {(['All', 'A', 'B', 'C'] as const).map(s => (
+                <button
+                  key={s}
+                  onClick={() => setStoreFilter(s)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-display tracking-wider transition-all ${
+                    storeFilter === s
+                      ? 'bg-primary/20 text-primary border border-primary/30 shadow-[0_0_10px_rgba(34,211,238,0.2)]'
+                      : 'text-muted-foreground hover:text-white'
+                  }`}
+                >
+                  {s === 'All' ? 'All Stores' : `Shop ${s}`}
+                </button>
+              ))}
+            </div>
+
+            <motion.button 
+              variants={item} 
+              onClick={onResetOrders} 
+              className="p-2 glass-card rounded-lg hover:bg-white/5 transition-colors flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary" 
+              title="Reset to Initial AI Recommendations"
+            >
+              <RotateCcw size={15} />
+              <span className="hidden sm:inline">Reset Queue</span>
+            </motion.button>
+
             <motion.button variants={item} onClick={loadOrders} className="p-2 glass-card rounded-lg hover:bg-white/5 transition-colors" title="Refresh">
               <RefreshCw size={16} className="text-muted-foreground" />
             </motion.button>
+
             <motion.button
               variants={item}
               whileHover={{ scale: 1.02 }}
@@ -270,7 +350,19 @@ const OrderNexus = () => {
                 {loading ? (
                   <tr><td colSpan={8} className="px-4 py-8 text-center text-sm text-muted-foreground font-body">Loading intelligent orders...</td></tr>
                 ) : filteredOrders.length === 0 ? (
-                  <tr><td colSpan={8} className="px-4 py-8 text-center text-sm text-muted-foreground font-body">No orders found. Run the forecasting engine first.</td></tr>
+                  <tr>
+                    <td colSpan={8} className="px-4 py-12 text-center text-sm text-muted-foreground font-body">
+                      <div className="flex flex-col items-center justify-center gap-3">
+                        <p>All recommended orders for this filter have been dispatched or fulfilled.</p>
+                        <button
+                          onClick={onResetOrders}
+                          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/20 hover:bg-primary/30 border border-primary/30 text-xs font-display text-primary transition-all"
+                        >
+                          <RefreshCw size={14} /> Re-seed Recommended Orders Queue
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 ) : filteredOrders.map(o => {
                   const isDispatched = dispatchedIds.includes(o.id);
                   return (

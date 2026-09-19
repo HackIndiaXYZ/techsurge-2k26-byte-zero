@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export type UserRole = 'owner' | 'manager';
 export type StoreId = 'A' | 'B' | 'C';
@@ -11,10 +12,17 @@ interface AppState {
   reset: () => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
-  role: null,
-  selectedStore: null,
-  setRole: (role) => set({ role }),
-  setSelectedStore: (store) => set({ selectedStore: store }),
-  reset: () => set({ role: null, selectedStore: null }),
-}));
+export const useAppStore = create<AppState>()(
+  persist(
+    (set) => ({
+      role: null,
+      selectedStore: null,
+      setRole: (role) => set({ role }),
+      setSelectedStore: (store) => set({ selectedStore: store }),
+      reset: () => set({ role: null, selectedStore: null }),
+    }),
+    {
+      name: 'senselog-storage',
+    }
+  )
+);
