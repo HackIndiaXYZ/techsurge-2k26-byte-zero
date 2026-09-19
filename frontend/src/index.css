@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Orbitron:wght@400..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 2%;
+    --foreground: 210 40% 92%;
+    --card: 222 30% 6%;
+    --card-foreground: 210 40% 92%;
+    --popover: 222 30% 6%;
+    --popover-foreground: 210 40% 92%;
+    --primary: 187 86% 53%;
+    --primary-foreground: 222 47% 4%;
+    --secondary: 222 30% 12%;
+    --secondary-foreground: 210 40% 92%;
+    --muted: 222 20% 14%;
+    --muted-foreground: 215 20% 55%;
+    --accent: 222 30% 15%;
+    --accent-foreground: 187 86% 53%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --success: 160 60% 45%;
+    --success-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 4%;
+    --border: 220 20% 18%;
+    --input: 220 20% 18%;
+    --ring: 187 86% 53%;
+    --radius: 1rem;
+    --sidebar-background: 222 30% 4%;
+    --sidebar-foreground: 210 40% 92%;
+    --sidebar-primary: 187 86% 53%;
+    --sidebar-primary-foreground: 222 47% 4%;
+    --sidebar-accent: 222 30% 10%;
+    --sidebar-accent-foreground: 210 40% 92%;
+    --sidebar-border: 220 20% 14%;
+    --sidebar-ring: 187 86% 53%;
+
+    --glow-cyan: 0 0 24px rgba(34, 211, 238, 0.15);
+    --glow-cyan-strong: 0 0 40px rgba(34, 211, 238, 0.25);
+    --glow-red: 0 0 24px rgba(239, 68, 68, 0.2);
+    --glow-amber: 0 0 24px rgba(245, 158, 11, 0.15);
+    --glow-green: 0 0 24px rgba(16, 185, 129, 0.15);
+
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 24px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Orbitron', sans-serif;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    @apply rounded-2xl;
+  }
+  .glass-card-glow {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glow-cyan);
+    @apply rounded-2xl;
+  }
+  .glass-card-alert {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    box-shadow: var(--glow-red);
+    @apply rounded-2xl;
+  }
+  .glow-btn {
+    @apply bg-primary text-primary-foreground font-display font-bold tracking-wider px-6 py-3 rounded-xl transition-all duration-300;
+    box-shadow: var(--glow-cyan);
+  }
+  .glow-btn:hover {
+    box-shadow: var(--glow-cyan-strong);
+    @apply scale-[1.03];
+  }
+  .shimmer {
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes scrollUp {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
