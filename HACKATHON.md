@@ -1,6 +1,6 @@
 # ⚡ SenseLog — Autonomous Neural Logistics & Real-Time Supply Chain Intelligence Engine
 
-> **🏆 Hackathon Submission Project Showcase**  
+> **🏆 Official Hackathon Project Submission & Devpost Showcase**  
 > *Transforming fragmented retail inventory into an autonomous, closed-loop neural logistics network powered by Deep Learning, Quantile Uncertainty Regression, Sentiment NLP, and 3D Geospatial Telemetry.*
 
 [![Devpost](https://img.shields.io/badge/Devpost-Project_Showcase-003E54?style=for-the-badge&logo=devpost&logoColor=white)](https://devpost.com)
@@ -16,46 +16,53 @@
 
 ---
 
+## 📌 Elevator Pitch
+
+**SenseLog** is an autonomous AI-powered supply chain command center that eliminates the $1.8 Trillion inventory distortion problem. By combining **LSTM neural networks**, **Quantile XGBoost regression**, **DistilBERT sentiment analysis**, and **Isolation Forest anomaly detection**, SenseLog predicts 30-day forward demand, detects localized sales anomalies, and autonomously dispatches dual-speed freight through an interactive **Three.js 3D geospatial command nexus**.
+
+---
+
 ## 💡 Inspiration: The $1.8 Trillion Problem
 
-Retailers and supply chains worldwide bleed over **$1.8 Trillion annually** due to "Inventory Distortion" — the deadly combination of out-of-stock items and overstocked inventory.
-- **Stockouts cost customers and loyalty**: An empty shelf doesn't just mean a lost sale; it permanently drives 32% of shoppers to competitors.
-- **Overstocking incinerates capital**: Tying up cash in slow-moving inventory destroys margins and leads to massive discounting or spoilage.
-- **The Bullwhip Effect**: Minor demand fluctuations at the retail store level ripple into chaotic over-reactions up the supplier chain.
-- **Disconnected Decisions**: Store managers guess restock quantities using static spreadsheets, while logistics operators dispatch freight blind to real-time customer sentiment and emerging local spikes.
+Retailers and global supply chains bleed over **$1.8 Trillion annually** due to "Inventory Distortion" — the deadly combination of out-of-stock items and overstocked inventory:
 
-**We asked ourselves:** *What if a retail supply chain operated like an autonomous nervous system? What if every point-of-sale ping, customer review, and vendor lead-time was harmonized in real time by an ensemble of specialized neural networks that predict stockouts before they happen and automatically dispatch the optimal freight?*
+1. **Stockouts Destroy Customer Loyalty**: An empty shelf doesn't just mean a lost sale; it permanently drives 32% of shoppers directly to competitors.
+2. **Overstocking Incinerates Capital**: Tying up cash in slow-moving inventory destroys margins, leads to steep clearance discounting, and creates massive warehouse waste.
+3. **The Bullwhip Effect**: Minor demand fluctuations at the retail store level ripple into chaotic over-reactions up the supplier chain.
+4. **Disconnected Decisions**: Store managers guess restock quantities using static spreadsheets, while logistics operators dispatch freight completely blind to real-time customer sentiment and emerging local surges.
 
-That is why we built **SenseLog**.
+### The Question That Drove Us:
+> *"What if a retail supply chain operated like an autonomous nervous system? What if every point-of-sale ping, customer review, and vendor lead-time was harmonized in real time by an ensemble of specialized neural networks that forecast stockouts days before they happen and automatically dispatch the optimal freight?"*
+
+That vision became **SenseLog**.
 
 ---
 
 ## 🚀 What SenseLog Does
 
-**SenseLog** is an end-to-end, multi-echelon autonomous supply chain command center. It bridges the gap between raw point-of-sale signals and physical freight fulfillment by orchestrating five specialized AI models into three synchronized operational portals:
+SenseLog transforms raw point-of-sale (POS) data into an autonomous, closed-loop supply chain across three synchronized operational portals:
 
-### 1. 🌐 Executive Command Center (HQ Commander)
-- **Live 3D WebGL Geospatial Hub**: Interactive 3D Earth globe rendering active fulfillment nodes across India (Mumbai, Delhi, Chennai, Bangalore, Kolkata) with pulsating telemetry arcs showing logistics flows in real-time.
-- **Autonomous Anomaly Sentinel**: An unsupervised machine learning pipeline continuously scanning retail streams to flag sudden demand surges, panic buying, or data discrepancies.
+### 1. 🌐 Executive Command Center (HQ Commander Dashboard)
+- **Live 3D WebGL Geospatial Hub**: Powered by Three.js and React Three Fiber, showing interactive 3D logistics arcs between major regional fulfillment hubs across India (Mumbai, Delhi, Chennai, Bangalore, Kolkata).
+- **Autonomous Anomaly Sentinel**: An unsupervised machine learning pipeline continuously scanning transaction feeds to flag sudden demand spikes, panic buying, or data errors in real-time.
 - **Store Performance Leaderboard**: Neural rankings evaluating store networks based on customer sentiment, 7-day revenue, and inventory health index.
 
-### 2. 🏬 Store-Level Micro-Logistics (Store Operations)
-- **30-Day Forward Demand Curves**: Multi-variate LSTM projections forecasting exact daily depletion across every SKU.
-- **Multi-Echelon Stock Simulation**: Uniquely differentiates between **visible shelf stock** and **backroom warehouse inventory**, simulating automatic shelf replenishment rules (`move_to_visible`).
+### 2. 🏬 Store-Level Micro-Logistics (Store Operations Dashboard)
+- **30-Day Forward Demand Curves**: Multi-variate LSTM projections forecasting exact daily consumption across every SKU.
+- **Multi-Echelon Stock Simulation**: Uniquely models the physical split between **visible shelf stock** and **backroom warehouse inventory**, simulating automatic shelf replenishment rules (`move_to_visible`).
 - **Predictive Stockout Date Warning**: Computes the exact day an item will run out of stock and calculates profit margins for the upcoming replenishment cycle.
 - **Customer Sentiment Radar**: Evaluates real customer reviews via DistilBERT NLP across 5 key operational axes: *Quality*, *Delivery*, *Price*, *Availability*, and *Service*.
 
 ### 3. ⚡ Order Nexus (Automated Procurement & Dispatch)
-- **AI-Recommended Purchase Orders**: Auto-generates reorder quantities and cutoff dates factoring lead times and minimum safety thresholds.
-- **Dual-Tier Freight Optimization (The Secret Sauce)**: Splits orders dynamically into **Quick 5-Day Express** and **Standard 10-Day Freight**. The allocation ratio dynamically scales based on store sentiment and urgency.
-- **Vendor Scoring & Matching**: Matches purchase orders to suppliers ranked by historical reliability scores and delivery speeds.
-- **Interactive Human-In-The-Loop Overrides**: Store and logistics managers can override quantities with instant, automated rebalancing of shipping splits and one-click execution.
+- **AI-Recommended Purchase Orders**: Automatically suggests reorder quantities and cutoff dates factoring vendor lead times and minimum safety thresholds.
+- **Dual-Tier Freight Optimization (The Secret Sauce)**: Dynamically splits purchase orders into **Quick 5-Day Express** (assigned to top vendors based on reliability) and **Standard 10-Day Freight**.
+- **Interactive Human-in-the-Loop Overrides**: Store managers can override order quantities with instant automatic rebalancing of freight splits and one-click execution.
 
 ---
 
-## 🧠 The AI / ML Neural Ensemble
+## 🧠 The AI / ML Neural Stack
 
-SenseLog does not rely on a single generic model. It deploys an ensemble of five specialized architectures tailored for specific logistics challenges:
+SenseLog deploys an ensemble of five specialized architectures tailored for specific logistics challenges:
 
 ```mermaid
 graph TD
@@ -78,14 +85,14 @@ graph TD
     API --> UI["React 18 + Three.js 3D Command Nexus (:5173)"]
 ```
 
-| Model | Architecture / Tech | Purpose & Impact |
+| Model / Subsystem | Architecture / Tech | Purpose & Key Metric |
 | :--- | :--- | :--- |
-| **LSTM Demand Forecaster** | Keras / TensorFlow Sequential (128 units $\rightarrow$ Dropout 0.2 $\rightarrow$ 64 units $\rightarrow$ Dense 1) | 7-day sliding window predicting next 30 days of demand while simulating shelf-to-backroom movements. Achieves **98.3% forecast accuracy**. |
-| **Quantile Regression Engine** | XGBoost (`objective='reg:quantileerror'`) | Predicts tri-quantile intervals ($\alpha = 0.1, 0.5, 0.9$) providing **P10 (Lower Bound)**, **P50 (Median)**, and **P90 (Upper Bound)** with feature gain explainability. |
-| **Anomaly Sentinel** | Scikit-Learn `IsolationForest` (Contamination = 1%) | Flags unnatural sales velocity and volume spikes in real-time, preventing artificial stockouts. |
-| **Customer Sentiment NLP** | Hugging Face Transformers (`distilbert-base-uncased-finetuned-sst-2-english`) | Extracts sentiment vectors from customer reviews to calculate store satisfaction indexes and modulate express shipping quotas. |
-| **Neural Store Ranker** | PyTorch Feedforward Linear Network (`LinearRankingModel`) | Blends monthly sales, customer sentiment, and review frequency to calculate fair store performance rankings. |
-| **Dual-Speed Freight Optimizer** | Python Heuristic Dispatch Algorithm | Dynamically allocates order percentages: $\text{Quick Qty} = \text{Total} \times (10\% + 15\% \times \text{Sentiment})$. |
+| **Demand Sequence Forecaster** | Keras / TensorFlow Sequential LSTM (128 units $\rightarrow$ Dropout 0.2 $\rightarrow$ 64 units $\rightarrow$ Dense 1) | Operates on 7-day sliding windows over demand, visible stock, and backroom inventory to generate 30-day forward projections. Achieves **98.3% forecast accuracy**. |
+| **Quantile Uncertainty Forecaster** | XGBoost (`objective='reg:quantileerror'`) | Produces tri-quantile forecasts ($\alpha = 0.1, 0.5, 0.9$) for **P10 (Lower Bound)**, **P50 (Point Forecast)**, and **P90 (Upper Bound)** with feature gain explainability. |
+| **Anomaly Sentinel** | Scikit-Learn `IsolationForest` (Contamination = 1%) | Unsupervised isolation trees detect abnormal consumption spikes, streaming alerts directly to HQ. |
+| **Sentiment Intelligence** | Hugging Face Transformers (`distilbert-base-uncased-finetuned-sst-2-english`) | Extracts continuous sentiment confidence scores ($0.0 \rightarrow 1.0$) from customer reviews to modulate express shipping quotas. |
+| **Neural Store Ranker** | PyTorch Linear Ranking Network (`LinearRankingModel`) | Blends monthly sales volume, customer sentiment vectors, and review frequency into store performance scores. |
+| **Dual-Speed Freight Optimizer** | Heuristic Algorithmic Engine | Dynamically splits orders: $\text{Quick Qty} = \text{Total} \times (10\% + 15\% \times \text{Sentiment})$, matching shipments to vendors from `vendor.csv`. |
 
 ---
 
@@ -93,7 +100,7 @@ graph TD
 
 ### **Frontend & User Experience**
 - **React 18 & TypeScript**: Scalable, strictly typed single-page application.
-- **Vite 5**: Lightning-fast Hot Module Replacement and bundle optimization.
+- **Vite 5**: Fast build tooling and Hot Module Replacement.
 - **Three.js & React Three Fiber (`@react-three/fiber`, `@react-three/drei`)**: WebGL-powered 3D Earth globe with real-time geospatial coordinate mapping, glowing hub markers, and animated quadratic Bezier logistics arcs.
 - **Tailwind CSS & Framer Motion**: Futuristic cyber-logistics design system featuring glassmorphic blur effects (`backdrop-blur-xl`), animated tickers, glowing borders, and staggered page transitions.
 - **Recharts**: High-density interactive data visualizations (Composed demand charts, stockout threshold lines, area curves, and multi-axis radar diagrams).
@@ -117,21 +124,20 @@ graph TD
 
 ---
 
-## 🧗 Challenges We Ran Into
+## 🧗 Challenges We Overcame
 
-- **Orchestrating Multiple Heavy ML Frameworks in One Pipeline**: Loading TensorFlow/Keras, PyTorch, XGBoost, and Hugging Face Transformers inside a responsive Flask service required careful memory and process management to prevent GPU/CPU thrashing and thread lock contention.
-- **Multi-Echelon Inventory Dynamics**: Modeling stock depletion when inventory transfers from backroom to display shelves in non-linear bursts was complex. We built a discrete step simulator that recalculates stock movements day-by-day across the 30-day window.
-- **3D Geospatial Performance on the Web**: Rendering a 3D Earth globe with atmosphere shaders, dynamic lighting, city coordinate projections, and animated arc curves at a constant 60 FPS required aggressive mesh optimization and React Three Fiber rendering loops.
-- **Data Inconsistencies Across Store Hubs**: Reconciling date formats, SKU naming variations, and disparate transaction logs across Stores A, B, and C led us to create robust data normalization pipelines.
+- **Heterogeneous Model Orchestration**: Running TensorFlow/Keras, PyTorch, Hugging Face Transformers, and XGBoost inside a single Python backend required careful resource and thread management to prevent CPU thrashing.
+- **60 FPS 3D WebGL Geospatial Rendering**: Rendering an animated 3D globe with city coordinate projections, atmosphere glow, and dynamic Bezier logistics arcs without degrading UI responsiveness.
+- **Multi-Store POS Normalization**: Harmonizing different schema conventions across stores into clean, unified daily time series.
 
 ---
 
-## 🏆 Accomplishments That We're Proud Of
+## 🏆 Accomplishments We're Proud Of
 
-- 🎯 **98.3% Forecast Accuracy**: Near-perfect 30-day forward demand trajectory prediction across 20+ core retail SKUs.
-- 📉 **74% Projected Stockout Reduction**: Validated reorder triggers that place vendor orders days before threshold breaches occur.
-- 🌐 **Immersive 3D Experience**: A stunning, cyber-aesthetic command center that feels like an enterprise mission control room rather than a boring spreadsheet.
-- 🔄 **True Closed-Loop Architecture**: Raw POS Data $\rightarrow$ Anomaly Detection $\rightarrow$ Neural Forecasting $\rightarrow$ Sentiment Adjustment $\rightarrow$ Optimal Freight Dispatch $\rightarrow$ Simulated Tracking.
+- 🎯 **98.3% Forecast Accuracy** on multi-variate retail SKU time-series.
+- 📉 **74% Projected Stockout Reduction** by placing purchase orders days prior to threshold breaches.
+- 🌐 **Immersive 3D Experience**: A cyber-aesthetic command center that feels like an enterprise mission control room rather than a boring spreadsheet.
+- 🔄 **True Closed-Loop Architecture**: Raw POS Data $\rightarrow$ Anomaly Detection $\rightarrow$ Deep Learning Forecast $\rightarrow$ Sentiment Adjustment $\rightarrow$ Freight Split Optimization $\rightarrow$ Dispatch.
 
 ---
 
@@ -145,14 +151,14 @@ graph TD
 
 ## 🔮 What's Next for SenseLog (Roadmap)
 
-- [ ] **Autonomous Vendor Negotiation Agents**: Multi-agent LLM bots that automatically negotiate dynamic bulk discounts and delivery terms with suppliers via email/API.
-- [ ] **Multi-Hop Carbon-Aware Freight Routing**: Integration with OpenRouteService and carbon accounting APIs to select routes that minimize both delivery time and $CO_2$ emissions.
+- [ ] **Autonomous LLM Vendor Negotiator**: Multi-agent LLM bots that automatically negotiate dynamic bulk discounts and delivery terms with suppliers via email/API.
+- [ ] **Multi-Hop Carbon-Aware Freight Routing**: Routing cargo based on minimum carbon footprint alongside delivery speed.
 - [ ] **Direct ERP Integrations**: Out-of-the-box connectors for SAP S/4HANA, Oracle NetSuite, and Shopify Plus.
-- [ ] **Edge IoT RFID Integration**: Live shelf sensor streaming using MQTT/WebSockets for sub-minute shelf depletion updates.
+- [ ] **IoT Smart Shelf Integration**: Sub-minute inventory tracking using RFID sensor feeds.
 
 ---
 
-## 🚀 Quickstart & Reproduction Guide
+## 💻 Quickstart (Run It in 3 Minutes)
 
 ### 1. Clone & Enter Repository
 ```bash
@@ -185,6 +191,6 @@ Visit **`http://localhost:5173`** to access the live SenseLog platform!
 
 ---
 
-## 👥 The Team
+## 👥 Hackathon Team
 
 Developed with ❤️ for the Hackathon by passionate engineers dedicated to revolutionizing global logistics through AI.
